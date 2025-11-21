@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FundBridge — MVP</title>
+  <style>
+    /* =========================
+       Color System (RGB first)
+       ========================= */
+    :root{
+      --g-900: 10, 58, 53;      /* deep green */
+      --g-800: 14, 84, 76;      /* teal green */
+      --g-700: 17, 102, 92;     
+      --g-600: 21, 123, 110;    
+      --g-500: 30, 146, 131;    
+      --g-400: 49, 171, 153;    
+      --g-300: 96, 191, 173;    
+      --g-200: 164, 215, 204;   
+      --g-100: 208, 232, 226;   /* minty surface */
+      --g-050: 234, 244, 241;   /* very light */
+
+      --text-900: 18, 28, 24;   /* near-black */
+      --text-700: 41, 56, 53;   
+      --white: 255,255,255;
+
+      --shadow: 10 24 22; /* approximate of g-900 */
+      --radius-2xl: 24px;
+      --radius-xl: 16px;
+
+      --warn: 255, 212, 131; /* warm accent for subtle warnings */
+      --danger: 255, 135, 135; /* soft red for errors */
+    }
+
+    /* Global reset and modern defaults */
+    *, *::before, *::after{ box-sizing: border-box; }
+    html, body{ height: 100%; }
+    body{
+      margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      color: rgb(var(--white));
+      background:
+        repeating-linear-gradient(135deg, rgb(0 0 0 / 0.0) 0 24px, rgb(255 255 255 / 0.03) 24px 48px),
+        linear-gradient(160deg, rgb(var(--g-900)) 0%, rgb(var(--g-700)) 40%, rgb(var(--g-600)) 100%);
+    }
+
+    .bg-ribbon{
+      position: fixed; inset: 0 0 auto 0; height: 180px; pointer-events: none; opacity: .35;
+      mask-image: linear-gradient(to bottom, black, transparent);
+    }
+
+    main{ min-height: 100dvh; display: grid; place-items: center; padding: 24px; }
+
+    .card{
+      width: min(960px, 100%);
+      display: grid; gap: 24px;
+      grid-template-columns: 1fr; 
+      background: linear-gradient(180deg, rgb(var(--white) / 0.06), rgb(var(--white) / 0.02));
+      border: 1px solid rgb(var(--white) / 0.08);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 16px 48px rgb(var(--shadow) / .3);
+      border-radius: var(--radius-2xl);
+      padding: clamp(20px, 4vw, 36px);
+    }
+
+    @media (min-width: 900px){ .card{ grid-template-columns: 1.1fr 1fr; } }
+
+    .brand{ display: grid; place-content: center; gap: 12px; padding: clamp(12px, 2vw, 16px); }
+    .brand h1{ margin: 0; font-size: clamp(28px, 5vw, 40px); letter-spacing: .2px; font-weight: 800; color: rgb(240 252 249); }
+    .brand p{ margin: 0; font-size: clamp(14px, 2.4vw, 18px); color: rgb(240 252 249 / .85); }
+
+    .logo-wrap{ display: grid; place-items: center; }
+    .logo{ width: clamp(180px, 38vw, 360px); height: auto; opacity: .9; filter: drop-shadow(0 4px 20px rgb(var(--shadow) / .25)); }
+
+    /* Inputs */
+    form{ display: grid; gap: 14px; align-content: start; }
+    label span.lbl{ display:block; margin-bottom:6px; font-weight:600; color: rgb(var(--white) / .9); }
+    .input-group{ position: relative; }
+    input[type="email"], input[type="password"], input[type="text"]{
+      width:100%; background: rgb(var(--white) / .08); color: rgb(var(--white));
+      border: 1px solid rgb(var(--white) / .15); border-radius: 14px; padding: 14px 44px 14px 14px;
+      outline: none; font-size: 16px; transition: border-color .2s, background .2s, box-shadow .2s;
+    }
+    input:focus{ border-color: rgb(var(--g-300)); box-shadow: 0 0 0 4px rgb(var(--g-300) / .2); background: rgb(var(--white) / .12); }
+    .toggle-eye{ position:absolute; right:10px; top:50%; transform:translateY(-50%); background: none; border: 0; color: rgb(var(--white) / .8); cursor:pointer; font-size: 14px; }
+
+    fieldset{ border: 1px solid rgb(var(--white) / .15); border-radius: 14px; padding: 12px 12px 8px; }
+    fieldset legend{ padding: 0 8px; color: rgb(var(--white) / .9); font-weight: 600; }
+
+    .role-options{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .role{ display:flex; align-items:center; gap:10px; cursor:pointer; user-select:none; background: rgb(var(--white) / .06); padding: 12px 12px; border-radius: 12px; border: 1px solid rgb(var(--white) / .12); transition: transform .08s ease, background .2s, border-color .2s; }
+    .role:active{ transform: scale(.98); }
+    .role input{ appearance:none; width:18px; height:18px; border-radius: 999px; border: 2px solid rgb(var(--white) / .6); display:grid; place-items:center; }
+    .role input:checked{ border-color: rgb(var(--g-300)); box-shadow: inset 0 0 0 4px rgb(var(--white) / 1); background: rgb(var(--g-300)); }
+
+    .row{ display:flex; align-items:center; gap:10px; }
+    .row label{ margin:0; }
+
+    .btn{ background: linear-gradient(180deg, rgb(var(--g-300)), rgb(var(--g-500))); color: rgb(var(--white)); border: 0; padding: 14px 18px; border-radius: 14px; font-weight: 700; font-size: 16px; box-shadow: 0 10px 24px rgb(var(--shadow) / .35), inset 0 1px 0 rgb(255 255 255 / .15); cursor:pointer; transition: transform .08s ease, filter .2s ease, box-shadow .2s ease; }
+    .btn:active{ transform: translateY(1px); }
+    .btn:hover{ filter: brightness(1.05); box-shadow: 0 14px 32px rgb(var(--shadow) / .38), inset 0 1px 0 rgb(255 255 255 / .18);}    
+
+    .btn.loading{ position: relative; pointer-events:none; opacity:.85; }
+    .btn.loading::after{ content:""; position:absolute; inset:auto 12px auto auto; width:18px; height:18px; border-radius:50%; border:3px solid rgb(var(--white) / .6); border-top-color: transparent; animation: spin .8s linear infinite; }
+    @keyframes spin{ to{ transform: rotate(360deg);} }
+
+    .muted{ color: rgb(var(--white) / .7); font-size: 14px; }
+    .error{ color: rgb(var(--danger)); font-size: 13px; margin-top: 6px; display:none; }
+    .invalid{ border-color: rgb(var(--danger)) !important; box-shadow: 0 0 0 4px rgb(var(--danger) / .22) !important; }
+
+    /* MAIN PAGE */
+    .hidden{ display:none; }
+    .topbar{ width: min(1100px, 100%); margin-inline: auto; display:flex; align-items:center; justify-content:space-between; padding: 14px 16px; border-radius: var(--radius-xl); background: linear-gradient(180deg, rgb(var(--white) / .06), rgb(var(--white) / .02)); border:1px solid rgb(var(--white) / .08); }
+    .tb-left{ display:flex; align-items:center; gap:10px; }
+    .logo-sm{ width:34px; height:34px; opacity:.9; }
+    .appname{ font-weight:800; letter-spacing:.2px; color: rgb(240 252 249); }
+
+    .tb-right{ display:flex; align-items:center; gap:10px; }
+    .pill{ padding: 8px 12px; border-radius: 999px; background: rgb(var(--white) / .12); border:1px solid rgb(var(--white) / .16); font-weight:700; }
+    .chip{ padding: 8px 10px; border-radius: 999px; background: rgb(var(--white) / .1); border:1px solid rgb(var(--white) / .16); font-weight:700; }
+
+    .menu{ position: relative; }
+    .menu-btn{ background: none; border: 0; color: rgb(var(--white)); padding: 8px 10px; border-radius: 10px; cursor:pointer; }
+    .dropdown{ position:absolute; right:0; top:110%; background: rgb(var(--white) / .06); border:1px solid rgb(var(--white) / .12); border-radius:12px; box-shadow: 0 10px 24px rgb(var(--shadow) / .35); display:none; min-width: 180px; overflow:hidden; }
+    .dropdown a, .dropdown button{ display:block; width:100%; text-align:left; padding:10px 12px; background:none; border:0; color: rgb(255 255 255 / .92); cursor:pointer; }
+    .dropdown a:hover, .dropdown button:hover{ background: rgb(var(--white) / .08); }
+    .dropdown.show{ display:block; }
+
+    .hero{ width: min(1100px, 100%); margin: 18px auto 0; display:grid; gap: 10px; padding: clamp(14px, 4vw, 32px); background: linear-gradient(180deg, rgb(var(--white) / .06), rgb(var(--white) / .02)); border:1px solid rgb(var(--white) / .08); border-radius: var(--radius-2xl); }
+    .hero h2{ font-size: clamp(22px, 4vw, 34px); margin: 0; color: rgb(248 255 252); }
+    .hero p{ font-size: clamp(14px, 2.6vw, 18px); margin: 0; color: rgb(var(--white) / .85); }
+    .hero .cta{ justify-self:start; margin-top: 8px; text-decoration:none; }
+
+    @media (prefers-reduced-motion: no-preference){ .btn, .role{ transition: transform .08s ease, background .2s, border-color .2s, box-shadow .2s; } }
+    :focus-visible{ outline: 3px solid rgb(var(--g-300)); outline-offset: 2px; border-radius: 10px; }
+  </style>
+</head>
+<body>
+
+  <!-- Decorative ribbon (inline SVG) echoing your motif -->
+  <svg class="bg-ribbon" viewBox="0 0 1200 180" aria-hidden="true">
+    <g stroke="rgb(240 252 249)" stroke-width="10" fill="none" opacity="0.55">
+      <path d="M20,120 c40,-40 80,40 120,0 c40,-40 80,40 120,0"/>
+      <path d="M520,40 v100"/> <path d="M560,20 v120"/> <path d="M600,40 v100"/>
+      <path d="M640,130 c80,-140 160,-140 240,0"/>
+      <path d="M760,130 c40,-70 80,-70 120,0"/>
+    </g>
+  </svg>
+
+  <main id="app">
+
+    <!-- =============== LOGIN VIEW =============== -->
+    <section id="login" class="view">
+      <div class="card">
+        <div class="brand">
+          <div class="logo-wrap">
+            <svg class="logo" viewBox="0 0 600 140" aria-hidden="true">
+              <g stroke="rgb(240 252 249)" stroke-width="12" fill="none">
+                <path d="M20,90 c40,-40 80,40 120,0 c40,-40 80,40 120,0"/>
+                <path d="M320,20 v100"/>
+                <path d="M360,0 v120"/>
+                <path d="M400,20 v100"/>
+                <path d="M440,100 c60,-120 120,-120 180,0"/>
+              </g>
+            </svg>
+          </div>
+          <h1>FundBridge</h1>
+          <p>Connecting Communities with Opportunities</p>
+        </div>
+
+        <form id="loginForm" autocomplete="on" novalidate>
+          <div class="input-group">
+            <label>
+              <span class="lbl">Email</span>
+              <input id="email" type="email" name="email" placeholder="you@domain.com" />
+            </label>
+            <div id="emailErr" class="error">Please enter a valid email.</div>
+          </div>
+          <div class="input-group">
+            <label>
+              <span class="lbl">Password</span>
+              <input id="password" type="password" name="password" placeholder="••••••••" />
+            </label>
+            <button class="toggle-eye" type="button" aria-label="Show/Hide password" id="togglePwd">👁︎</button>
+            <div class="muted">(Demo mode — credentials are not validated)</div>
+            <div id="pwdErr" class="error">Password must be at least 6 characters.</div>
+          </div>
+
+          <div class="row">
+            <label class="row" for="remember">
+              <input id="remember" type="checkbox" />
+              <span class="muted">Remember me</span>
+            </label>
+          </div>
+
+          <fieldset>
+            <legend>Who are you?</legend>
+            <div class="role-options">
+              <label class="role">
+                <input type="radio" name="role" value="Investor" checked />
+                <span>Investor</span>
+              </label>
+              <label class="role">
+                <input type="radio" name="role" value="Startup Maker" />
+                <span>Startup Maker</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <button id="loginBtn" class="btn" type="submit">Get Started</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- =============== MAIN VIEW =============== -->
+    <section id="main" class="view hidden" aria-live="polite">
+      <header class="topbar">
+        <div class="tb-left">
+          <svg class="logo-sm" viewBox="0 0 120 40" aria-hidden="true">
+            <g stroke="rgb(240 252 249)" stroke-width="5" fill="none">
+              <path d="M5,28 c8,-8 16,8 24,0 c8,-8 16,8 24,0"/>
+              <path d="M68,4 v28"/> <path d="M78,0 v32"/> <path d="M88,4 v28"/>
+            </g>
+          </svg>
+          <span class="appname">FundBridge</span>
+        </div>
+        <div class="tb-right">
+          <span class="pill" id="roleBadge">Investor</span>
+          <span class="chip" id="userChip" title="Signed in">AR</span>
+          <div class="menu">
+            <button class="menu-btn" id="menuBtn">⋯</button>
+            <div class="dropdown" id="menuDrop" role="menu">
+              <button id="switchRole">Switch role</button>
+              <button id="logout">Log out</button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="hero">
+        <h2 id="heroTitle">Access funding opportunities</h2>
+        <p id="heroText">Manage your applications and connect with resources designed to help you succeed.</p>
+        <a href="#" class="btn cta" id="heroCta">Explore Opportunities</a>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    (function(){
+      const loginView = document.getElementById('login');
+      const mainView = document.getElementById('main');
+      const form = document.getElementById('loginForm');
+      const badge = document.getElementById('roleBadge');
+      const userChip = document.getElementById('userChip');
+      const emailInput = document.getElementById('email');
+      const pwdInput = document.getElementById('password');
+      const emailErr = document.getElementById('emailErr');
+      const pwdErr = document.getElementById('pwdErr');
+      const togglePwd = document.getElementById('togglePwd');
+      const remember = document.getElementById('remember');
+      const loginBtn = document.getElementById('loginBtn');
+      const menuBtn = document.getElementById('menuBtn');
+      const menuDrop = document.getElementById('menuDrop');
+      const logoutBtn = document.getElementById('logout');
+      const switchRoleBtn = document.getElementById('switchRole');
+
+      const heroTitle = document.getElementById('heroTitle');
+      const heroText  = document.getElementById('heroText');
+      const heroCta   = document.getElementById('heroCta');
+
+      const COPY = {
+        Investor: {
+          title: 'Discover high‑potential startups',
+          text:  'Filter by stage, traction and sector. Track due‑diligence and co‑invest with your network.',
+          cta:   'Browse Startups'
+        },
+        'Startup Maker': {
+          title: 'Find the right capital & grants',
+          text:  'Match with investors and programs that fit your stage. Submit once, apply everywhere.',
+          cta:   'See Funding Programs'
+        }
+      };
+
+      function show(view){
+        if(view === 'main'){
+          loginView.classList.add('hidden');
+          mainView.classList.remove('hidden');
+        } else {
+          mainView.classList.add('hidden');
+          loginView.classList.remove('hidden');
+        }
+      }
+
+      function initialsFromEmail(email){
+        if(!email) return 'FB';
+        const name = email.split('@')[0];
+        const parts = name.replace(/[^a-zA-Z0-9]+/g,' ').trim().split(' ');
+        const first = parts[0] || 'F';
+        const second = (parts[1] || 'B');
+        return (first[0] + (second[0]||'')).toUpperCase();
+      }
+
+      function setHero(role){
+        const c = COPY[role] || COPY['Investor'];
+        heroTitle.textContent = c.title; heroText.textContent = c.text; heroCta.textContent = c.cta;
+      }
+
+      function setRole(role){
+        localStorage.setItem('fundbridge_role', role);
+        badge.textContent = role;
+        setHero(role);
+      }
+
+      function setUser(email){
+        if(email){ localStorage.setItem('fundbridge_email', email); }
+        const stored = localStorage.getItem('fundbridge_email');
+        userChip.textContent = initialsFromEmail(stored);
+      }
+
+      function validate(){
+        let ok = true;
+        const email = emailInput.value.trim();
+        const pwd   = pwdInput.value;
+        const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if(!emailRe.test(email)){
+          emailErr.style.display = 'block'; emailInput.classList.add('invalid'); ok = false;
+        } else { emailErr.style.display = 'none'; emailInput.classList.remove('invalid'); }
+
+        if(pwd && pwd.length < 6){
+          pwdErr.style.display = 'block'; pwdInput.classList.add('invalid'); ok = false;
+        } else { pwdErr.style.display = 'none'; pwdInput.classList.remove('invalid'); }
+
+        return ok;
+      }
+
+      function startLoading(btn){ btn.classList.add('loading'); btn.disabled = true; }
+      function stopLoading(btn){ btn.classList.remove('loading'); btn.disabled = false; }
+
+      // Restore session
+      const savedRole = localStorage.getItem('fundbridge_role');
+      const savedEmail = localStorage.getItem('fundbridge_email');
+      if(savedEmail){ emailInput.value = savedEmail; remember.checked = true; setUser(savedEmail); }
+      if(savedRole){ setRole(savedRole); show('main'); }
+
+      // Show/Hide password
+      togglePwd.addEventListener('click', ()=>{
+        const t = pwdInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        pwdInput.setAttribute('type', t);
+      });
+
+      // Menu
+      menuBtn.addEventListener('click', ()=>{ menuDrop.classList.toggle('show'); });
+      document.addEventListener('click', (e)=>{ if(!menuBtn.contains(e.target) && !menuDrop.contains(e.target)) menuDrop.classList.remove('show'); });
+
+      logoutBtn.addEventListener('click', ()=>{
+        localStorage.removeItem('fundbridge_role');
+        if(!remember.checked){ localStorage.removeItem('fundbridge_email'); }
+        show('login');
+      });
+
+      switchRoleBtn.addEventListener('click', ()=>{
+        const current = localStorage.getItem('fundbridge_role') || 'Investor';
+        const next = current === 'Investor' ? 'Startup Maker' : 'Investor';
+        setRole(next);
+        menuDrop.classList.remove('show');
+      });
+
+      form.addEventListener('submit', (e)=>{
+        e.preventDefault();
+        if(!validate()) return;
+
+        const fd = new FormData(form);
+        const role = (fd.get('role')||'Investor');
+        const email = (fd.get('email')||'').trim();
+        if(remember.checked && email){ localStorage.setItem('fundbridge_email', email); }
+        setUser(email);
+        setRole(role);
+        startLoading(loginBtn);
+        // Simulate network delay for UX
+        setTimeout(()=>{ stopLoading(loginBtn); show('main'); }, 650);
+      });
+    })();
+
+
+
+    
+heroCta.addEventListener('click', (e) => {
+  e.preventDefault();
+
+  // Prefer saved role; fallback to the currently checked radio
+  const saved = localStorage.getItem('fundbridge_role') || '';
+  const picked = document.querySelector('input[name="role"]:checked')?.value || '';
+  const role = (saved || picked).toLowerCase();
+
+  // IMPORTANT: your file name is "sturtuper.html"
+  const target = role.includes('startup') ? 'sturtuper.html' : 'investor.html';
+  window.location.assign(target);
+});
+
+  </script>
+
+</body>
+</html>
