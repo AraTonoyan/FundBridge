@@ -596,19 +596,18 @@
       e.preventDefault();
       const fd = new FormData(e.target);
       const email = fd.get('loginEmail');
+      const password = fd.get('loginPass');
       const savedUser = JSON.parse(localStorage.getItem('fundUser'));
 
       if (savedUser && savedUser.common.email === email) {
-        localStorage.setItem('activeUser', JSON.stringify(savedUser));
-        window.location.href = savedUser.role === 'Investor' ? 'investor.html' : 'sturtuper.html';
+        if (savedUser.common.password === password) {
+          localStorage.setItem('activeUser', JSON.stringify(savedUser));
+          window.location.href = savedUser.role === 'Investor' ? 'investor.html' : 'sturtuper.html';
+        } else {
+          alert('Incorrect password! Please try again.');
+        }
       } else {
-        const role = email.includes('startup') ? 'Startup' : 'Investor';
-        localStorage.setItem('activeUser', JSON.stringify({
-          role: role,
-          common: { email: email, fullName: role === 'Investor' ? 'Demo Investor' : 'Demo Founder' },
-          specific: {}
-        }));
-        window.location.href = role === 'Investor' ? 'investor.html' : 'sturtuper.html';
+        alert('No account found with this email! Please sign up first.');
       }
     }
 
