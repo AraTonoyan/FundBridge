@@ -1,404 +1,644 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>FundBridge — MVP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+  <title>FundBridge — Connect & Grow</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;700;800&display=swap"
+    rel="stylesheet">
+
   <style>
     /* =========================
-       Color System (RGB first)
+       Greenify Design System
        ========================= */
-    :root{
-      --g-900: 10, 58, 53;      /* deep green */
-      --g-800: 14, 84, 76;      /* teal green */
-      --g-700: 17, 102, 92;     
-      --g-600: 21, 123, 110;    
-      --g-500: 30, 146, 131;    
-      --g-400: 49, 171, 153;    
-      --g-300: 96, 191, 173;    
-      --g-200: 164, 215, 204;   
-      --g-100: 208, 232, 226;   /* minty surface */
-      --g-050: 234, 244, 241;   /* very light */
+    :root {
+      /* Brand Greens */
+      --g-900: 5, 40, 35;
+      --g-800: 10, 58, 53;
+      --g-700: 17, 102, 92;
+      --g-500: 44, 151, 139;
+      --g-300: 96, 191, 173;
+      --g-100: 208, 232, 226;
 
-      --text-900: 18, 28, 24;   /* near-black */
-      --text-700: 41, 56, 53;   
-      --white: 255,255,255;
+      --brand: #2c978b;
+      --brand-glow: #4fd1c5;
 
-      --shadow: 10 24 22; /* approximate of g-900 */
-      --radius-2xl: 24px;
-      --radius-xl: 16px;
+      --glass-bg: rgba(10, 58, 53, 0.4);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --glass-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
 
-      --warn: 255, 212, 131; /* warm accent for subtle warnings */
-      --danger: 255, 135, 135; /* soft red for errors */
+      --radius-xl: 24px;
+      --radius-lg: 16px;
     }
 
-    /* Global reset and modern defaults */
-    *, *::before, *::after{ box-sizing: border-box; }
-    html, body{ height: 100%; }
-    body{
-      margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
-      color: rgb(var(--white));
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: white;
+      background-color: #052624;
+      overflow-x: hidden;
+      position: relative;
+      display: grid;
+      place-items: center;
+    }
+
+    /* Animated Green Mesh */
+    .bg-mesh {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
       background:
-        repeating-linear-gradient(135deg, rgb(0 0 0 / 0.0) 0 24px, rgb(255 255 255 / 0.03) 24px 48px),
-        linear-gradient(160deg, rgb(var(--g-900)) 0%, rgb(var(--g-700)) 40%, rgb(var(--g-600)) 100%);
+        radial-gradient(at 0% 0%, #116b60 0px, transparent 50%),
+        radial-gradient(at 100% 0%, #0a4d44 0px, transparent 50%),
+        radial-gradient(at 100% 100%, #17665c 0px, transparent 50%),
+        radial-gradient(at 0% 100%, #052624 0px, transparent 50%);
+      background-size: 200% 200%;
+      animation: meshMove 20s ease-in-out infinite alternate;
+      /* Overlay Pattern */
+      box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.5);
     }
 
-    .bg-ribbon{
-      position: fixed; inset: 0 0 auto 0; height: 180px; pointer-events: none; opacity: .35;
-      mask-image: linear-gradient(to bottom, black, transparent);
+    @keyframes meshMove {
+      0% {
+        background-position: 0% 50%;
+        opacity: 0.8;
+      }
+
+      50% {
+        background-position: 100% 50%;
+        opacity: 1;
+      }
+
+      100% {
+        background-position: 50% 100%;
+        opacity: 0.8;
+      }
     }
 
-    main{ min-height: 100dvh; display: grid; place-items: center; padding: 24px; }
-
-    .card{
-      width: min(960px, 100%);
-      display: grid; gap: 24px;
-      grid-template-columns: 1fr; 
-      background: linear-gradient(180deg, rgb(var(--white) / 0.06), rgb(var(--white) / 0.02));
-      border: 1px solid rgb(var(--white) / 0.08);
-      backdrop-filter: blur(6px);
-      box-shadow: 0 16px 48px rgb(var(--shadow) / .3);
-      border-radius: var(--radius-2xl);
-      padding: clamp(20px, 4vw, 36px);
+    /* Floating Orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.5;
+      z-index: -1;
+      animation: float 25s infinite;
     }
 
-    @media (min-width: 900px){ .card{ grid-template-columns: 1.1fr 1fr; } }
+    .orb-1 {
+      width: 400px;
+      height: 400px;
+      background: #2c978b;
+      top: -100px;
+      left: -100px;
+      animation-delay: 0s;
+    }
 
-    .brand{ display: grid; place-content: center; gap: 12px; padding: clamp(12px, 2vw, 16px); }
-    .brand h1{ margin: 0; font-size: clamp(28px, 5vw, 40px); letter-spacing: .2px; font-weight: 800; color: rgb(240 252 249); }
-    .brand p{ margin: 0; font-size: clamp(14px, 2.4vw, 18px); color: rgb(240 252 249 / .85); }
+    .orb-2 {
+      width: 300px;
+      height: 300px;
+      background: #4fd1c5;
+      bottom: -50px;
+      right: -50px;
+      animation-delay: -10s;
+    }
 
-    .logo-wrap{ display: grid; place-items: center; }
-    .logo{ width: clamp(180px, 38vw, 360px); height: auto; opacity: .9; filter: drop-shadow(0 4px 20px rgb(var(--shadow) / .25)); }
+    @keyframes float {
+      0% {
+        transform: translate(0, 0) rotate(0deg);
+      }
+
+      33% {
+        transform: translate(50px, 50px) rotate(120deg);
+      }
+
+      66% {
+        transform: translate(-30px, 80px) rotate(240deg);
+      }
+
+      100% {
+        transform: translate(0, 0) rotate(360deg);
+      }
+    }
+
+    main {
+      width: 100%;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(16px, 4vw, 32px);
+      position: relative;
+      z-index: 1;
+    }
+
+    .container {
+      width: min(500px, 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Logo */
+    .logo-area {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .logo-area h1 {
+      font-family: 'Outfit', sans-serif;
+      margin: 0;
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      color: white;
+      text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .logo-area p {
+      margin: 8px 0 0;
+      opacity: 0.9;
+      font-size: 16px;
+      font-weight: 500;
+      color: #ccfbf6;
+    }
+
+    /* Glass Card */
+    .card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-radius: var(--radius-xl);
+      padding: 40px;
+      box-shadow: var(--glass-shadow);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    /* Desktop optimization */
+    @media (min-width: 1024px) {
+      .container {
+        width: 500px;
+      }
+
+      .card {
+        padding: 48px;
+      }
+    }
+
+    h2 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      text-align: center;
+      margin: 0 0 24px;
+      font-size: 24px;
+    }
 
     /* Inputs */
-    form{ display: grid; gap: 14px; align-content: start; }
-    label span.lbl{ display:block; margin-bottom:6px; font-weight:600; color: rgb(var(--white) / .9); }
-    .input-group{ position: relative; }
-    input[type="email"], input[type="password"], input[type="text"]{
-      width:100%; background: rgb(var(--white) / .08); color: rgb(var(--white));
-      border: 1px solid rgb(var(--white) / .15); border-radius: 14px; padding: 14px 44px 14px 14px;
-      outline: none; font-size: 16px; transition: border-color .2s, background .2s, box-shadow .2s;
+    label {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+      margin-left: 4px;
+      color: #ccfbf6;
     }
-    input:focus{ border-color: rgb(var(--g-300)); box-shadow: 0 0 0 4px rgb(var(--g-300) / .2); background: rgb(var(--white) / .12); }
-    .toggle-eye{ position:absolute; right:10px; top:50%; transform:translateY(-50%); background: none; border: 0; color: rgb(var(--white) / .8); cursor:pointer; font-size: 14px; }
 
-    fieldset{ border: 1px solid rgb(var(--white) / .15); border-radius: 14px; padding: 12px 12px 8px; }
-    fieldset legend{ padding: 0 8px; color: rgb(var(--white) / .9); font-weight: 600; }
+    .input,
+    textarea.input,
+    select.input {
+      width: 100%;
+      padding: 16px 20px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-lg);
+      color: white;
+      font-size: 16px;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s ease;
+      outline: none;
+    }
 
-    .role-options{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .role{ display:flex; align-items:center; gap:10px; cursor:pointer; user-select:none; background: rgb(var(--white) / .06); padding: 12px 12px; border-radius: 12px; border: 1px solid rgb(var(--white) / .12); transition: transform .08s ease, background .2s, border-color .2s; }
-    .role:active{ transform: scale(.98); }
-    .role input{ appearance:none; width:18px; height:18px; border-radius: 999px; border: 2px solid rgb(var(--white) / .6); display:grid; place-items:center; }
-    .role input:checked{ border-color: rgb(var(--g-300)); box-shadow: inset 0 0 0 4px rgb(var(--white) / 1); background: rgb(var(--g-300)); }
+    .input:focus {
+      background: rgba(0, 0, 0, 0.6);
+      border-color: var(--brand-glow);
+      box-shadow: 0 0 0 4px rgba(79, 209, 197, 0.2);
+    }
 
-    .row{ display:flex; align-items:center; gap:10px; }
-    .row label{ margin:0; }
+    select.input {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 20px center;
+      background-size: 18px;
+      padding-right: 42px;
+    }
 
-    .btn{ background: linear-gradient(180deg, rgb(var(--g-300)), rgb(var(--g-500))); color: rgb(var(--white)); border: 0; padding: 14px 18px; border-radius: 14px; font-weight: 700; font-size: 16px; box-shadow: 0 10px 24px rgb(var(--shadow) / .35), inset 0 1px 0 rgb(255 255 255 / .15); cursor:pointer; transition: transform .08s ease, filter .2s ease, box-shadow .2s ease; }
-    .btn:active{ transform: translateY(1px); }
-    .btn:hover{ filter: brightness(1.05); box-shadow: 0 14px 32px rgb(var(--shadow) / .38), inset 0 1px 0 rgb(255 255 255 / .18);}    
+    /* Buttons */
+    .btn {
+      width: 100%;
+      padding: 18px;
+      border: none;
+      border-radius: var(--radius-lg);
+      font-size: 16px;
+      font-weight: 700;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
 
-    .btn.loading{ position: relative; pointer-events:none; opacity:.85; }
-    .btn.loading::after{ content:""; position:absolute; inset:auto 12px auto auto; width:18px; height:18px; border-radius:50%; border:3px solid rgb(var(--white) / .6); border-top-color: transparent; animation: spin .8s linear infinite; }
-    @keyframes spin{ to{ transform: rotate(360deg);} }
+    .btn:active {
+      transform: scale(0.96);
+    }
 
-    .muted{ color: rgb(var(--white) / .7); font-size: 14px; }
-    .error{ color: rgb(var(--danger)); font-size: 13px; margin-top: 6px; display:none; }
-    .invalid{ border-color: rgb(var(--danger)) !important; box-shadow: 0 0 0 4px rgb(var(--danger) / .22) !important; }
+    .btn-primary {
+      background: linear-gradient(135deg, #2c978b 0%, #17665c 100%);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
 
-    /* MAIN PAGE */
-    .hidden{ display:none; }
-    .topbar{ width: min(1100px, 100%); margin-inline: auto; display:flex; align-items:center; justify-content:space-between; padding: 14px 16px; border-radius: var(--radius-xl); background: linear-gradient(180deg, rgb(var(--white) / .06), rgb(var(--white) / .02)); border:1px solid rgb(var(--white) / .08); }
-    .tb-left{ display:flex; align-items:center; gap:10px; }
-    .logo-sm{ width:34px; height:34px; opacity:.9; }
-    .appname{ font-weight:800; letter-spacing:.2px; color: rgb(240 252 249); }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #4fd1c5 0%, #2c978b 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(79, 209, 197, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
 
-    .tb-right{ display:flex; align-items:center; gap:10px; }
-    .pill{ padding: 8px 12px; border-radius: 999px; background: rgb(var(--white) / .12); border:1px solid rgb(var(--white) / .16); font-weight:700; }
-    .chip{ padding: 8px 10px; border-radius: 999px; background: rgb(var(--white) / .1); border:1px solid rgb(var(--white) / .16); font-weight:700; }
+    .btn-role {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 24px;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
 
-    .menu{ position: relative; }
-    .menu-btn{ background: none; border: 0; color: rgb(var(--white)); padding: 8px 10px; border-radius: 10px; cursor:pointer; }
-    .dropdown{ position:absolute; right:0; top:110%; background: rgb(var(--white) / .06); border:1px solid rgb(var(--white) / .12); border-radius:12px; box-shadow: 0 10px 24px rgb(var(--shadow) / .35); display:none; min-width: 180px; overflow:hidden; }
-    .dropdown a, .dropdown button{ display:block; width:100%; text-align:left; padding:10px 12px; background:none; border:0; color: rgb(255 255 255 / .92); cursor:pointer; }
-    .dropdown a:hover, .dropdown button:hover{ background: rgb(var(--white) / .08); }
-    .dropdown.show{ display:block; }
+    .btn-role:hover {
+      background: rgba(79, 209, 197, 0.15);
+      border-color: var(--brand-glow);
+      transform: scale(1.02);
+    }
 
-    .hero{ width: min(1100px, 100%); margin: 18px auto 0; display:grid; gap: 10px; padding: clamp(14px, 4vw, 32px); background: linear-gradient(180deg, rgb(var(--white) / .06), rgb(var(--white) / .02)); border:1px solid rgb(var(--white) / .08); border-radius: var(--radius-2xl); }
-    .hero h2{ font-size: clamp(22px, 4vw, 34px); margin: 0; color: rgb(248 255 252); }
-    .hero p{ font-size: clamp(14px, 2.6vw, 18px); margin: 0; color: rgb(var(--white) / .85); }
-    .hero .cta{ justify-self:start; margin-top: 8px; text-decoration:none; }
+    .btn-role strong {
+      font-size: 18px;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-    @media (prefers-reduced-motion: no-preference){ .btn, .role{ transition: transform .08s ease, background .2s, border-color .2s, box-shadow .2s; } }
-    :focus-visible{ outline: 3px solid rgb(var(--g-300)); outline-offset: 2px; border-radius: 10px; }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+    }
+
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: white;
+    }
+
+    .nav-link {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 15px;
+      color: #a0aec0;
+    }
+
+    .link {
+      color: var(--brand-glow);
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      position: relative;
+    }
+
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .chk-tag input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .chk-tag span {
+      display: block;
+      padding: 10px 18px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 99px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.7);
+      transition: all 0.2s;
+    }
+
+    .chk-tag input:checked+span {
+      background: var(--brand-glow);
+      color: var(--g-900);
+      box-shadow: 0 4px 12px rgba(44, 151, 139, 0.4);
+      border-color: transparent;
+    }
+
+    .hidden {
+      display: none !important;
+    }
   </style>
 </head>
+
 <body>
 
-  <!-- Decorative ribbon (inline SVG) echoing your motif -->
-  <svg class="bg-ribbon" viewBox="0 0 1200 180" aria-hidden="true">
-    <g stroke="rgb(240 252 249)" stroke-width="10" fill="none" opacity="0.55">
-      <path d="M20,120 c40,-40 80,40 120,0 c40,-40 80,40 120,0"/>
-      <path d="M520,40 v100"/> <path d="M560,20 v120"/> <path d="M600,40 v100"/>
-      <path d="M640,130 c80,-140 160,-140 240,0"/>
-      <path d="M760,130 c40,-70 80,-70 120,0"/>
-    </g>
-  </svg>
+  <div class="bg-mesh"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
 
-  <main id="app">
+  <main>
+    <div class="container">
 
-    <!-- =============== LOGIN VIEW =============== -->
-    <section id="login" class="view">
-      <div class="card">
-        <div class="brand">
-          <div class="logo-wrap">
-            <svg class="logo" viewBox="0 0 600 140" aria-hidden="true">
-              <g stroke="rgb(240 252 249)" stroke-width="12" fill="none">
-                <path d="M20,90 c40,-40 80,40 120,0 c40,-40 80,40 120,0"/>
-                <path d="M320,20 v100"/>
-                <path d="M360,0 v120"/>
-                <path d="M400,20 v100"/>
-                <path d="M440,100 c60,-120 120,-120 180,0"/>
-              </g>
-            </svg>
-          </div>
-          <h1>FundBridge</h1>
-          <p>Connecting Communities with Opportunities</p>
+      <!-- LOGO -->
+      <div class="logo-area">
+        <h1>FundBridge</h1>
+        <p>Expert Matching for Investors & Startups</p>
+      </div>
+
+      <!-- VIEW: Login -->
+      <div id="view-login" class="card active">
+        <h2>Welcome Back</h2>
+        <form onsubmit="handleLogin(event)" style="display:flex; flex-direction:column; gap:20px;">
+          <div><label>Email Address</label><input type="email" name="loginEmail" class="input"
+              placeholder="you@domain.com" required></div>
+          <div><label>Password</label><input type="password" name="loginPass" class="input" placeholder="••••••••"
+              required></div>
+          <button type="submit" class="btn btn-primary">Log In</button>
+        </form>
+        <div class="nav-link">New here? <span class="link" onclick="switchView('view-signup-role')">Create
+            Account</span></div>
+      </div>
+
+      <!-- VIEW: Step 1 Role -->
+      <div id="view-signup-role" class="card hidden">
+        <h2>I am a...</h2>
+        <div style="display:flex; flex-direction:column; gap:16px;">
+          <button class="btn btn-role" onclick="startSignup('Investor')">
+            <strong>Investor <span>→</span></strong>
+            <span style="opacity:0.8; font-size:15px; font-weight:400; line-height:1.5;">Discover vetted startups and
+              manage your deal flow efficiently.</span>
+          </button>
+          <button class="btn btn-role" onclick="startSignup('Startup')">
+            <strong>Startup Founder <span>→</span></strong>
+            <span style="opacity:0.8; font-size:15px; font-weight:400; line-height:1.5;">Get matched with the right
+              capital and scale your business.</span>
+          </button>
         </div>
+        <div class="nav-link">Have an account? <span class="link" onclick="switchView('view-login')">Log In</span></div>
+      </div>
 
-        <form id="loginForm" autocomplete="on" novalidate>
-          <div class="input-group">
-            <label>
-              <span class="lbl">Email</span>
-              <input id="email" type="email" name="email" placeholder="you@domain.com" />
-            </label>
-            <div id="emailErr" class="error">Please enter a valid email.</div>
-          </div>
-          <div class="input-group">
-            <label>
-              <span class="lbl">Password</span>
-              <input id="password" type="password" name="password" placeholder="••••••••" />
-            </label>
-            <button class="toggle-eye" type="button" aria-label="Show/Hide password" id="togglePwd">👁︎</button>
-            <div class="muted">(Demo mode — credentials are not validated)</div>
-            <div id="pwdErr" class="error">Password must be at least 6 characters.</div>
-          </div>
-
-          <div class="row">
-            <label class="row" for="remember">
-              <input id="remember" type="checkbox" />
-              <span class="muted">Remember me</span>
-            </label>
-          </div>
-
-          <fieldset>
-            <legend>Who are you?</legend>
-            <div class="role-options">
-              <label class="role">
-                <input type="radio" name="role" value="Investor" checked />
-                <span>Investor</span>
-              </label>
-              <label class="role">
-                <input type="radio" name="role" value="Startup Maker" />
-                <span>Startup Maker</span>
-              </label>
+      <!-- VIEW: Step 2 Common -->
+      <div id="view-signup-common" class="card hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <h2 style="margin:0">Details</h2>
+          <span style="opacity:0.6; font-weight:600;">Step 1 of 2</span>
+        </div>
+        <form onsubmit="handleCommonNext(event)" style="display:flex; flex-direction:column; gap:16px;">
+          <div style="display:flex; gap:16px;">
+            <div style="flex:1;"><label>Full Name</label><input type="text" name="fullName" class="input" required>
             </div>
-          </fieldset>
+            <div style="flex:1;"><label>Phone</label><input type="tel" name="phone" class="input" required></div>
+          </div>
+          <div><label>Email Address</label><input type="email" name="email" class="input" required></div>
+          <div><label>Password</label><input type="password" name="password" class="input" required minlength="6"></div>
+          <div><label>LinkedIn Profile</label><input type="url" name="linkedin" class="input"
+              placeholder="https://linkedin.com/in/..."></div>
+          <div><label>Location</label><input type="text" name="location" class="input" placeholder="City, Country"
+              required></div>
 
-          <button id="loginBtn" class="btn" type="submit">Get Started</button>
+          <div style="display:flex; gap:12px; margin-top:8px;">
+            <button type="button" class="btn btn-outline" style="flex:1"
+              onclick="switchView('view-signup-role')">Back</button>
+            <button type="submit" class="btn btn-primary" style="flex:2">Next Step</button>
+          </div>
         </form>
       </div>
-    </section>
 
-    <!-- =============== MAIN VIEW =============== -->
-    <section id="main" class="view hidden" aria-live="polite">
-      <header class="topbar">
-        <div class="tb-left">
-          <svg class="logo-sm" viewBox="0 0 120 40" aria-hidden="true">
-            <g stroke="rgb(240 252 249)" stroke-width="5" fill="none">
-              <path d="M5,28 c8,-8 16,8 24,0 c8,-8 16,8 24,0"/>
-              <path d="M68,4 v28"/> <path d="M78,0 v32"/> <path d="M88,4 v28"/>
-            </g>
-          </svg>
-          <span class="appname">FundBridge</span>
+      <!-- VIEW: Step 3 Investor -->
+      <div id="view-signup-investor" class="card hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <h2 style="margin:0">Preferences</h2>
+          <span style="opacity:0.6; font-weight:600;">Step 2 of 2</span>
         </div>
-        <div class="tb-right">
-          <span class="pill" id="roleBadge">Investor</span>
-          <span class="chip" id="userChip" title="Signed in">AR</span>
-          <div class="menu">
-            <button class="menu-btn" id="menuBtn">⋯</button>
-            <div class="dropdown" id="menuDrop" role="menu">
-              <button id="switchRole">Switch role</button>
-              <button id="logout">Log out</button>
+        <form onsubmit="completeSignup(event)" style="display:flex; flex-direction:column; gap:20px;">
+
+          <div>
+            <label>Investment Type</label>
+            <select name="invType" class="input">
+              <option>Angel Investor</option>
+              <option>Venture Capitalist (VC)</option>
+              <option>Corporate Investor</option>
+              <option>Family Office</option>
+            </select>
+          </div>
+
+          <div style="display:flex; gap:16px;">
+            <div style="flex:1;">
+              <label>Ticket Size</label>
+              <select name="invRange" class="input">
+                <option value="10k-50k">$10k - $50k</option>
+                <option value="50k-100k">$50k - $100k</option>
+                <option value="100k-500k">$100k - $500k</option>
+                <option value="500k+">$500k+</option>
+              </select>
+            </div>
+            <div style="flex:1;">
+              <label>Pref. Stage</label>
+              <select name="invStage" class="input">
+                <option>Seed</option>
+                <option>Early Stage</option>
+                <option>Growth</option>
+                <option>All Stages</option>
+              </select>
             </div>
           </div>
-        </div>
-      </header>
 
-      <div class="hero">
-        <h2 id="heroTitle">Access funding opportunities</h2>
-        <p id="heroText">Manage your applications and connect with resources designed to help you succeed.</p>
-        <a href="#" class="btn cta" id="heroCta">Explore Opportunities</a>
+          <div>
+            <label>Industries of Interest</label>
+            <div class="checkbox-group">
+              <label class="chk-tag"><input type="checkbox" name="industry" value="Tech"><span>Tech</span></label>
+              <label class="chk-tag"><input type="checkbox" name="industry"
+                  value="Healthcare"><span>Health</span></label>
+              <label class="chk-tag"><input type="checkbox" name="industry" value="FinTech"><span>FinTech</span></label>
+              <label class="chk-tag"><input type="checkbox" name="industry"
+                  value="E-commerce"><span>E-comm</span></label>
+              <label class="chk-tag"><input type="checkbox" name="industry" value="AI"><span>AI / ML</span></label>
+            </div>
+          </div>
+
+          <div><label>Previous Investments</label><input type="text" name="prevInv" class="input"
+              placeholder="e.g. Acme Corp..."></div>
+          <div><label>What are you looking for?</label><textarea name="lookingFor" class="input" rows="2"
+              placeholder="Describe your thesis..."></textarea></div>
+
+          <button type="submit" class="btn btn-primary">Complete Signup</button>
+        </form>
       </div>
-    </section>
 
+      <!-- VIEW: Step 3 Startup -->
+      <div id="view-signup-startup" class="card hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <h2 style="margin:0">Startup Info</h2>
+          <span style="opacity:0.6; font-weight:600;">Step 2 of 2</span>
+        </div>
+        <form onsubmit="completeSignup(event)" style="display:flex; flex-direction:column; gap:16px;">
+          <div><label>Startup Name</label><input type="text" name="startupName" class="input" required></div>
+
+          <div style="display:flex; gap:16px;">
+            <div style="flex:1;">
+              <label>Industry</label>
+              <select name="startupIndustry" class="input">
+                <option>Tech / SaaS</option>
+                <option>Healthcare</option>
+                <option>Fintech</option>
+                <option>E-commerce</option>
+                <option>Consumer</option>
+              </select>
+            </div>
+            <div style="flex:1;">
+              <label>Stage</label>
+              <select name="startupStage" class="input">
+                <option>Idea</option>
+                <option>MVP</option>
+                <option>Revenue</option>
+                <option>Scaling</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:16px;">
+            <div style="flex:1;"><label>Funding Needed</label><input type="text" name="fundingNeeded" class="input"
+                placeholder="$250k"></div>
+            <div style="flex:1;"><label>Team Size</label><input type="number" name="teamSize" class="input"
+                placeholder="e.g 3"></div>
+          </div>
+
+          <div><label>Website / Pitch Deck URL</label><input type="url" name="pitchUrl" class="input"
+              placeholder="https://..."></div>
+          <div><label>Elevator Pitch (200 chars)</label><textarea name="pitch" class="input" rows="2" maxlength="200"
+              required></textarea></div>
+          <div><label>What are you looking for?</label><input type="text" name="lookingFor" class="input"
+              placeholder="e.g. Lead investor..."></div>
+
+          <button type="submit" class="btn btn-primary">Complete Signup</button>
+        </form>
+      </div>
+
+    </div>
   </main>
 
   <script>
-    (function(){
-      const loginView = document.getElementById('login');
-      const mainView = document.getElementById('main');
-      const form = document.getElementById('loginForm');
-      const badge = document.getElementById('roleBadge');
-      const userChip = document.getElementById('userChip');
-      const emailInput = document.getElementById('email');
-      const pwdInput = document.getElementById('password');
-      const emailErr = document.getElementById('emailErr');
-      const pwdErr = document.getElementById('pwdErr');
-      const togglePwd = document.getElementById('togglePwd');
-      const remember = document.getElementById('remember');
-      const loginBtn = document.getElementById('loginBtn');
-      const menuBtn = document.getElementById('menuBtn');
-      const menuDrop = document.getElementById('menuDrop');
-      const logoutBtn = document.getElementById('logout');
-      const switchRoleBtn = document.getElementById('switchRole');
+    // --- APP STATE ---
+    let signupData = { role: '', common: {} };
 
-      const heroTitle = document.getElementById('heroTitle');
-      const heroText  = document.getElementById('heroText');
-      const heroCta   = document.getElementById('heroCta');
+    // --- NAVIGATION ---
+    function switchView(viewId) {
+      document.querySelectorAll('.card').forEach(el => el.classList.add('hidden'));
+      const target = document.getElementById(viewId);
+      target.classList.remove('hidden');
+      target.style.opacity = 0;
+      target.style.transform = 'scale(0.98)';
+      setTimeout(() => {
+        target.style.opacity = 1;
+        target.style.transform = 'scale(1)';
+      }, 50);
+    }
 
-      const COPY = {
-        Investor: {
-          title: 'Discover high‑potential startups',
-          text:  'Filter by stage, traction and sector. Track due‑diligence and co‑invest with your network.',
-          cta:   'Browse Startups'
-        },
-        'Startup Maker': {
-          title: 'Find the right capital & grants',
-          text:  'Match with investors and programs that fit your stage. Submit once, apply everywhere.',
-          cta:   'See Funding Programs'
-        }
+    function startSignup(role) {
+      signupData.role = role;
+      switchView('view-signup-common');
+    }
+
+    // --- HANDLERS ---
+    function handleLogin(e) {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const email = fd.get('loginEmail');
+      const savedUser = JSON.parse(localStorage.getItem('fundUser'));
+
+      if (savedUser && savedUser.common.email === email) {
+        localStorage.setItem('activeUser', JSON.stringify(savedUser));
+        window.location.href = savedUser.role === 'Investor' ? 'investor.html' : 'sturtuper.html';
+      } else {
+        const role = email.includes('startup') ? 'Startup' : 'Investor';
+        localStorage.setItem('activeUser', JSON.stringify({
+          role: role,
+          common: { email: email, fullName: role === 'Investor' ? 'Demo Investor' : 'Demo Founder' },
+          specific: {}
+        }));
+        window.location.href = role === 'Investor' ? 'investor.html' : 'sturtuper.html';
+      }
+    }
+
+    function handleCommonNext(e) {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      signupData.common = Object.fromEntries(fd.entries());
+      if (signupData.role === 'Investor') switchView('view-signup-investor');
+      else switchView('view-signup-startup');
+    }
+
+    function completeSignup(e) {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const specificData = Object.fromEntries(fd.entries());
+      const industries = fd.getAll('industry');
+      if (industries.length) specificData.industry = industries;
+
+      const finalUser = {
+        role: signupData.role,
+        common: signupData.common,
+        specific: specificData,
+        joined: new Date().toISOString()
       };
 
-      function show(view){
-        if(view === 'main'){
-          loginView.classList.add('hidden');
-          mainView.classList.remove('hidden');
-        } else {
-          mainView.classList.add('hidden');
-          loginView.classList.remove('hidden');
-        }
-      }
-
-      function initialsFromEmail(email){
-        if(!email) return 'FB';
-        const name = email.split('@')[0];
-        const parts = name.replace(/[^a-zA-Z0-9]+/g,' ').trim().split(' ');
-        const first = parts[0] || 'F';
-        const second = (parts[1] || 'B');
-        return (first[0] + (second[0]||'')).toUpperCase();
-      }
-
-      function setHero(role){
-        const c = COPY[role] || COPY['Investor'];
-        heroTitle.textContent = c.title; heroText.textContent = c.text; heroCta.textContent = c.cta;
-      }
-
-      function setRole(role){
-        localStorage.setItem('fundbridge_role', role);
-        badge.textContent = role;
-        setHero(role);
-      }
-
-      function setUser(email){
-        if(email){ localStorage.setItem('fundbridge_email', email); }
-        const stored = localStorage.getItem('fundbridge_email');
-        userChip.textContent = initialsFromEmail(stored);
-      }
-
-      function validate(){
-        let ok = true;
-        const email = emailInput.value.trim();
-        const pwd   = pwdInput.value;
-        const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        if(!emailRe.test(email)){
-          emailErr.style.display = 'block'; emailInput.classList.add('invalid'); ok = false;
-        } else { emailErr.style.display = 'none'; emailInput.classList.remove('invalid'); }
-
-        if(pwd && pwd.length < 6){
-          pwdErr.style.display = 'block'; pwdInput.classList.add('invalid'); ok = false;
-        } else { pwdErr.style.display = 'none'; pwdInput.classList.remove('invalid'); }
-
-        return ok;
-      }
-
-      function startLoading(btn){ btn.classList.add('loading'); btn.disabled = true; }
-      function stopLoading(btn){ btn.classList.remove('loading'); btn.disabled = false; }
-
-      // Restore session
-      const savedRole = localStorage.getItem('fundbridge_role');
-      const savedEmail = localStorage.getItem('fundbridge_email');
-      if(savedEmail){ emailInput.value = savedEmail; remember.checked = true; setUser(savedEmail); }
-      if(savedRole){ setRole(savedRole); show('main'); }
-
-      // Show/Hide password
-      togglePwd.addEventListener('click', ()=>{
-        const t = pwdInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        pwdInput.setAttribute('type', t);
-      });
-
-      // Menu
-      menuBtn.addEventListener('click', ()=>{ menuDrop.classList.toggle('show'); });
-      document.addEventListener('click', (e)=>{ if(!menuBtn.contains(e.target) && !menuDrop.contains(e.target)) menuDrop.classList.remove('show'); });
-
-      logoutBtn.addEventListener('click', ()=>{
-        localStorage.removeItem('fundbridge_role');
-        if(!remember.checked){ localStorage.removeItem('fundbridge_email'); }
-        show('login');
-      });
-
-      switchRoleBtn.addEventListener('click', ()=>{
-        const current = localStorage.getItem('fundbridge_role') || 'Investor';
-        const next = current === 'Investor' ? 'Startup Maker' : 'Investor';
-        setRole(next);
-        menuDrop.classList.remove('show');
-      });
-
-      form.addEventListener('submit', (e)=>{
-        e.preventDefault();
-        if(!validate()) return;
-
-        const fd = new FormData(form);
-        const role = (fd.get('role')||'Investor');
-        const email = (fd.get('email')||'').trim();
-        if(remember.checked && email){ localStorage.setItem('fundbridge_email', email); }
-        setUser(email);
-        setRole(role);
-        startLoading(loginBtn);
-        // Simulate network delay for UX
-        setTimeout(()=>{ stopLoading(loginBtn); show('main'); }, 650);
-      });
-    })();
-
-
-
-    
-heroCta.addEventListener('click', (e) => {
-  e.preventDefault();
-
-  // Prefer saved role; fallback to the currently checked radio
-  const saved = localStorage.getItem('fundbridge_role') || '';
-  const picked = document.querySelector('input[name="role"]:checked')?.value || '';
-  const role = (saved || picked).toLowerCase();
-
-  // IMPORTANT: your file name is "sturtuper.html"
-  const target = role.includes('startup') ? 'sturtuper.html' : 'investor.html';
-  window.location.assign(target);
-});
-
+      localStorage.setItem('fundUser', JSON.stringify(finalUser));
+      localStorage.setItem('activeUser', JSON.stringify(finalUser));
+      window.location.href = signupData.role === 'Investor' ? 'investor.html' : 'sturtuper.html';
+    }
   </script>
-
 </body>
+
 </html>
